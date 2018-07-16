@@ -6,7 +6,9 @@ var settings = {
   background: 32,
   map: "data/agartha.png",
   map_max_x: 1024,
-  map_max_y: 1024
+  map_max_y: 1024,
+  rot_scale: 0.0008,
+  damping: 0
 };
 
 
@@ -31,13 +33,17 @@ function setup() {
   var canvas = createCanvas(windowWidth, windowHeight, WEBGL);
   setAttributes('antialias', true);
 
-  easycam = createEasyCam(p5.RendererGL, {distance:500});
-  easycam.setRotationConstraint(false, true, true);
-  easycam.zoom(500);
+  var state = {
+    distance : 900,
+    center   : [0, 0, 0]
+  };
 
+  easycam = createEasyCam(this._renderer, state);
+  easycam.setRotationScale(settings.rot_scale);
+  easycam.setDamping(settings.damping);
 
-  //easycam.rotateZ(-PI * 0.25);
-  //easycam.rotateX(-PI * 0.1);
+  easycam.rotateZ(-PI * 0.1);
+  easycam.rotateX(-PI * 0.25);
 }
 
 function draw() {
