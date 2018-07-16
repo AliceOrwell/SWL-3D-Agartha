@@ -78,6 +78,20 @@ function draw() {
 
   //jumps
   drawJumps(jumps);
+
+  //lore
+  noStroke();
+  fill(70, 70, 230);
+  for (var i=0; i < lore.length; i++) {
+    if (lore[i].length > 0) {
+      var p = lore[i];
+
+      push();
+      translate(p[0], p[1], -p[2] * 0.5);
+      box(5);
+      pop();
+    }
+  }
 }
 
 function drawJumps(jumps) {
@@ -91,7 +105,6 @@ function drawJumps(jumps) {
     drawVertex(p2);
     endShape();
   }
-
 }
 
 function drawBranches(branches) {
@@ -113,9 +126,8 @@ function drawBranch(branch_data) {
 
   push();
   // fill
-  stroke(32);
-  fill(234, 222, 86);
-  stroke(234, 222, 86);
+
+  stroke(240, 230, 120);
   noFill();
   beginShape();
   for (var i=0; i < branch_data.length; i++) {
