@@ -4,6 +4,7 @@ var selColourMode;
 var stepCount;
 
 var settings = {
+  version: "0.0.1",
   background: 32,
   map: "data/agartha.png",
   map_max_x: 1024,
@@ -12,7 +13,7 @@ var settings = {
   wheel_scale: 60,
   damping: 0.4,
   jumps_col: [255, 40, 40],
-  colourMode: "Height",
+  colourMode: "Basic",
   render_axis: false,
   render_lore: true,
   render_branches: true,
@@ -98,7 +99,7 @@ function draw() {
     drawLore(lore);
   }
 
-  //displayHUD();
+  displayHUD();
 }
 
 

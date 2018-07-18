@@ -3,6 +3,8 @@ function initHUD() {
   var hright = select('#hud-right');
 
   // left side
+  createElement('li', "Version:"   ).parent(hleft).attribute('gap', '');
+
   createElement('li', "Framerate:" ).parent(hleft).attribute('gap', '');
   createElement('li', "Viewport:"  ).parent(hleft);
   createElement('li', "Distance:"  ).parent(hleft).attribute('gap', '');
@@ -12,10 +14,15 @@ function initHUD() {
 
   // right side
   createElement('li', '.').parent(hright).class('').attribute('gap', '');
+  createElement('li', '.').parent(hright).class('').attribute('gap', '');
   createElement('li', '.').parent(hright).class('');
   createElement('li', '.').parent(hright).class('orange').attribute('gap', '');
   createElement('li', '.').parent(hright).class('orange');
   createElement('li', '.').parent(hright).class('orange');
+
+  // populate nonchanging info
+  var ul = select('#hud-right');
+  ul.elt.children[0].innerHTML = settings.version;
 
   var e = createElement('li').parent(hright).class('').attribute('gap', '');
   selColourMode = createSelect().parent(e);
@@ -37,12 +44,12 @@ function displayHUD() {
   var state = easycam.getState();
 
   var ul = select('#hud-right');
-  ul.elt.children[0].innerHTML = nfs(frameRate()          , 1, 2);
-  ul.elt.children[1].innerHTML = nfs(easycam.getViewport(), 1, 0);
-  ul.elt.children[2].innerHTML = nfs(state.distance       , 1, 2);
-  ul.elt.children[3].innerHTML = nfs(state.center         , 1, 2);
-  ul.elt.children[4].innerHTML = nfs(state.rotation       , 1, 3);
+  ul.elt.children[1].innerHTML = nfs(frameRate()          , 1, 2);
+  ul.elt.children[2].innerHTML = nfs(easycam.getViewport(), 1, 0);
+  ul.elt.children[3].innerHTML = nfs(state.distance       , 1, 2);
+  ul.elt.children[4].innerHTML = nfs(state.center         , 1, 2);
+  ul.elt.children[5].innerHTML = nfs(state.rotation       , 1, 3);
 
-  easycam.beginHUD();
-  easycam.endHUD();
+  //easycam.beginHUD();
+  //easycam.endHUD();
 }
