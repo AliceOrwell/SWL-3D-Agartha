@@ -1,8 +1,64 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    height: 100%;
+    width: 100%;
+}
+
 body {
-  background: #FFFFFF none repeat scroll 0 0;
-  font-family: Tahoma,Calibri,Verdana,Geneva,sans-serif;
-  font-size: 0.9em;
-  margin: 0 auto;
-  min-width: 800px;
-  text-align: center;
+    background-color: RGB(0,0,0);
+    background-color: RGBA(0,0,0,1);
+    color: rgb(200, 200, 200);
+    font-family: Tahoma,Calibri,Verdana,Geneva,sans-serif;
+    font-size: 0.9em;
+    font-style: normal;
+    font-variant: normal;
+    font-weight: 400;
+    height:100%;
+    letter-spacing: 1px;
+    width:100%;
+}
+
+.hud {
+  background-color: RGB(0,0,0);
+  background-color: RGBA(0,0,0,0.9);
+  border: 1px solid #000;
+  border-radius: 5px;
+  box-shadow: 0 0 10px 1px #000;
+  color: #FFFFFF;
+  font-size: 10pt;
+  left: 10px;
+  padding: 10px;
+  position: fixed;
+  top: 10px;
+}
+
+select {
+  height: auto;
+  line-height: 14px;
+}
+
+ul {
+  color: #FFFFFF;
+  list-style-type: none;
+  padding: 10px;
+}
+
+ul.two{
+  display: inline-block;
+  vertical-align:top;
+}
+
+ul .green{
+  color: rgb(100,200,0);
+}
+ul .orange{
+  color: rgb(255,128,0);
+}
+
+li[gap]{
+  margin-top: 10px;
 }
