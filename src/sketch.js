@@ -6,6 +6,9 @@ var stepCount;
 var settings = {
   version: "0.0.1",
   background: 32,
+  cam_rot: [0.908, 0.418, -0.009, 0.003],
+  cam_dis: 700,
+  cam_pos: [0, 0, 0],
   map: "data/agartha.png",
   map_max_x: 1024,
   map_max_y: 1024,
@@ -41,9 +44,9 @@ function setup() {
   setAttributes('antialias', true);
 
   var state = {
-    distance : 700,
-    center   : [0, 0, 0],
-    rotation : [0.826, 0.414, -0.211, 0.317]
+    distance : settings.cam_dis,
+    center   : settings.cam_pos,
+    rotation : settings.cam_rot
   };
 
   easycam = new Dw.EasyCam(this._renderer, state);
