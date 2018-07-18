@@ -1,5 +1,7 @@
 var easycam;
+var img;
 var selColourMode;
+var stepCount;
 
 var settings = {
   background: 32,
@@ -10,15 +12,15 @@ var settings = {
   wheel_scale: 60,
   damping: 0.4,
   jumps_col: [255, 40, 40],
-  colourMode: "Basic"
+  colourMode: "Height",
+  render_axis: false,
+  render_lore: true,
+  render_branches: true,
+  render_map: true,
+  render_jumps: true,
+  branch_stroke_weight: 1.2
 };
 
-
-var stars;
-var numStars = 500;
-var speed = 10;
-
-var img;
 
 function preload() {
   img = loadImage(settings.map);
@@ -30,13 +32,15 @@ function windowResized() {
 }
 
 function setup() {
+  stepCount = 0;
+
   pixelDensity(1);
 
   var canvas = createCanvas(windowWidth-5, windowHeight-5, WEBGL);
   setAttributes('antialias', true);
 
   var state = {
-    distance : 900,
+    distance : 700,
     center   : [0, 0, 0],
     rotation : [0.826, 0.414, -0.211, 0.317]
   };
@@ -46,114 +50,102 @@ function setup() {
   easycam.setDamping(settings.damping);
   easycam.setWheelScale(settings.wheel_scale);
 
-  //easycam.rotateZ(-PI * 0.1);
-  //easycam.rotateX(-PI * 0.25);
-
   initHUD();
 }
 
 function draw() {
+  stepCount++;
+  stepCount = stepCount % 1000;
+
   // projection
-  //perspective(60 * PI/180, windowWidth/windowHeight, 1, 20000);
-  perspective(60 * PI/180, width/height, 1, 5000);
+  perspective(60 * PI/180, windowWidth/windowHeight, 1, 1900);
 
   // background
   background(settings.background);
 
+  // offset everything so the coord system matches the map's
   var offset_x = settings.map_max_x * 0.5;
   var offset_y = settings.map_max_y * 0.5;
-
   translate(-offset_x, offset_y);
   rotateX(-PI);
 
-  // map
-  push();
-  translate(settings.map_max_x/2, settings.map_max_y/2);
-  rotateX(PI);
-  texture(img);
-  plane(settings.map_max_x, settings.map_max_y);
-  pop();
-
-  fill(150);
+  fill(50);
+  stroke(50);
   strokeWeight(2);
 
+  // map
+  if (settings.render_map) {
+    drawMap();
+  }
+
   //axis
-  //drawAxis();
+  if (settings.render_axis) {
+    drawAxis();
+  }
 
   //branches
-  drawBranches(branches);
+  if (settings.render_branches) {
+    drawBranches(branches);
+  }
 
   //jumps
-  drawJumps(jumps);
+  if (settings.render_jumps) {
+    drawJumps(jumps);
+  }
 
   //lore
-  noStroke();
-  fill(70, 70, 230);
+  if (settings.render_lore) {
+    drawLore(lore);
+  }
+
+  //displayHUD();
+}
+
+
+function drawMap() {
+  push();
+
+  translate(settings.map_max_x/2, settings.map_max_y/2);
+  rotateX(PI);
+
+  texture(img);
+  plane(settings.map_max_x, settings.map_max_y);
+
+  normalMaterial();
+  pop();
+}
+
+function drawLore(lore) {
+  push();
+
+  stroke(32);
+  strokeWeight(0.5);
+  fill(250, 180, 0);
+
   for (var i=0; i < lore.length; i++) {
     if (lore[i].length > 0) {
       var p = lore[i];
 
       push();
-      translate(p[0], p[1], -p[2] * 0.5);
-      box(5);
+      var z = (-p[2] * 0.5) - 2;
+      translate(p[0], p[1], z);
+
+      var r  = stepCount % 360;
+      rotateZ(r * PI/180);
+      box(5, 2, 5);
       pop();
     }
   }
-
-  displayHUD();
-}
-
-function initHUD() {
-  var hleft = select('#hud-left');
-  var hright = select('#hud-right');
-
-  // left side
-  createElement('li', "Framerate:" ).parent(hleft).attribute('gap', '');
-  createElement('li', "Viewport:"  ).parent(hleft);
-  createElement('li', "Distance:"  ).parent(hleft).attribute('gap', '');
-  createElement('li', "Center:"    ).parent(hleft);
-  createElement('li', "Rotation:"  ).parent(hleft);
-  createElement('li', "Colour Mode").parent(hleft).attribute('gap', '');
-
-  // right side
-  createElement('li', '.').parent(hright).class('').attribute('gap', '');
-  createElement('li', '.').parent(hright).class('');
-  createElement('li', '.').parent(hright).class('orange').attribute('gap', '');
-  createElement('li', '.').parent(hright).class('orange');
-  createElement('li', '.').parent(hright).class('orange');
-
-  var e = createElement('li').parent(hright).class('').attribute('gap', '');
-  selColourMode = createSelect().parent(e);
-  selColourMode.option('Basic');
-  selColourMode.option('Height');
-  selColourMode.option('Proximity');
-  selColourMode.changed(selColourModeEvent);
-}
-
-
-function selColourModeEvent() {
-  var item = selColourMode.value();
-  settings.colourMode = item;
-}
-
-function displayHUD() {
-
-
-  var state = easycam.getState();
-
-  var ul = select('#hud-right');
-  ul.elt.children[0].innerHTML = nfs(frameRate()          , 1, 2);
-  ul.elt.children[1].innerHTML = nfs(easycam.getViewport(), 1, 0);
-  ul.elt.children[2].innerHTML = nfs(state.distance       , 1, 2);
-  ul.elt.children[3].innerHTML = nfs(state.center         , 1, 2);
-  ul.elt.children[4].innerHTML = nfs(state.rotation       , 1, 3);
-
-  easycam.beginHUD();
-  easycam.endHUD();
+  pop();
 }
 
 function drawJumps(jumps) {
+  push();
+
   stroke(settings.jumps_col);
+  strokeWeight(1);
+  noFill();
+
   for (var i=0; i < jumps.length-1; i+=2) {
     var p1 = jumps[i];
     var p2 = jumps[i+1];
@@ -163,6 +155,8 @@ function drawJumps(jumps) {
     drawVertex(p2);
     endShape();
   }
+
+  pop();
 }
 
 function drawBranches(branches) {
@@ -174,13 +168,8 @@ function drawBranches(branches) {
 }
 
 function drawBranch(branch_data) {
-  stroke(190, 190, 190);
-  var p1 = branch_data[0];
-  var p2 = [p1[0], p1[1], 0];
-  beginShape();
-    drawVertex(p1);
-    drawVertex(p2);
-  endShape();
+  // hight line
+  drawHeightLine(branch_data[0]);
 
   if (settings.colourMode == "Proximity") {
     colourDistance(branch_data);
@@ -196,20 +185,25 @@ function drawBranch(branch_data) {
 function colourBasic(branch_data) {
   push();
 
-  stroke(240, 230, 120);
+  stroke(240, 230, 170);
+  strokeWeight(settings.branch_stroke_weight);
   noFill();
+
   beginShape();
   for (var i=0; i < branch_data.length; i++) {
     var v = branch_data[i];
     drawVertex(v);
   }
   endShape(CLOSE);
+
   pop();
 }
 
 function colourDistance(branch_data) {
   push();
+
   colorMode(HSB, 255);
+  strokeWeight(settings.branch_stroke_weight);
   noFill();
 
   for (var i=0; i < branch_data.length-1; i++) {
@@ -222,15 +216,15 @@ function colourDistance(branch_data) {
 function colourHeight(branch_data) {
   push();
   colorMode(HSB, 255);
+  strokeWeight(settings.branch_stroke_weight);
   noFill();
 
   var v = branch_data[0];
   var v_min = 0;
-  var v_max = 510;
-  var ch = map(v[2], v_min, v_max, 10, 60);
-  var cs = map(v[2], v_min, v_max, 220, 255);
-  var cb = map(v[2], v_min, v_max, 240, 255);
-  stroke(ch, cs, cb);
+  var v_max = 510;    // magic number - > heightest agartha point
+  var ch = map(v[2], v_min, v_max, 0, 250);
+
+  stroke(ch, 255, 255);
 
   beginShape();
   for (var i=0; i < branch_data.length; i++) {
@@ -238,6 +232,21 @@ function colourHeight(branch_data) {
     drawVertex(v);
   }
   endShape(CLOSE);
+  pop();
+}
+
+function drawHeightLine(point) {
+  push();
+
+  stroke(190, 190, 190);
+  strokeWeight(0.8);
+
+  var p1 = point;
+  var p2 = [point[0], point[1], 0];
+  beginShape();
+    drawVertex(p1);
+    drawVertex(p2);
+  endShape();
   pop();
 }
 
@@ -253,32 +262,31 @@ function drawBranchSeg(p1, p2) {
     return x + y + z;
   }
 
-
-
   var pos_c = easycam.getPosition();
+
   var pos = [];
   pos[0] = p1[0] - (settings.map_max_x * 0.5);
   pos[1] = p1[1] - (settings.map_max_y * 0.5);
   pos[2] = -p1[2] * 0.5;
+
   var dist = manhatten(pos_c, pos);
 
-  var d_max = Math.abs(pos_c[0]) + Math.abs(pos_c[1]) + Math.abs(pos_c[2]);
-
-  if (d_max > settings.map_max_x/2) {
-    d_max = settings.map_max_x/2;
-    dist = dist % (settings.map_max_x/2);
-  }
+  var dist_c = Math.abs(pos_c[0]) + Math.abs(pos_c[1]) + Math.abs(pos_c[2]);
+  var d_max = (settings.map_max_x/2) + (settings.map_max_x/2) + 510;
   var d_min = 0;
+  if (dist_c > (settings.map_max_x/2)) {
+    d_min = (settings.map_max_x/2);
+  }
 
-  var ch = map(dist, d_min, d_max, 10, 200);
-  var cs = map(dist, d_min, d_max, 255, 0);
-  var cb = map(dist, d_min, d_max, 255, 200);
+  var ch = map(dist, d_min, d_max, 10, 230);
   stroke(ch, 255, 255);
 
+  push();
   beginShape();
   drawVertex(p1);
   drawVertex(p2);
   endShape();
+  pop();
 }
 
 function drawVertex(p) {
